@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Удаление статьи — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <div class="admin-heading">
+        <div>
+            <p class="admin-eyebrow">MOKKA COFFEE / MANAGEMENT</p>
+            <h1>Удаление статьи</h1>
+            <p class="admin-subtitle">
+                Подтверждение удаления публикации.
+            </p>
+        </div>
+
+        <a href="{% url 'admin_blog' %}" class="admin-back-link">
+            ← К списку статей
+        </a>
+    </div>
+
+    <div class="admin-section admin-delete-section">
+
+        <p class="admin-eyebrow">ВНИМАНИЕ</p>
+
+        <h2>Вы действительно хотите удалить статью?</h2>
+
+        <p class="admin-delete-text">
+            «{{ post.title }}»
+        </p>
+
+        <p class="admin-subtitle">
+            Это действие нельзя будет отменить.
+        </p>
+
+        <form method="post" class="admin-delete-form">
+            {% csrf_token %}
+
+            <button type="submit" class="admin-delete-button">
+                УДАЛИТЬ СТАТЬЮ
+            </button>
+
+            <a href="{% url 'admin_blog' %}" class="admin-back-link">
+                Отмена
+            </a>
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

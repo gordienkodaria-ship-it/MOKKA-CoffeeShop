@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}MOKKA — Кофейня{% endblock %}
+
+{% block content %}
+
+<div class="mokka-home">
+
+    <!-- ГЛАВНЫЙ ЭКРАН -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <p class="hero-eyebrow">
+                МЕСТО, ГДЕ МОЖНО ОСТАНОВИТЬСЯ · С 2018
+            </p>
+
+            <h1 class="hero-title">
+                Кофе — это<br>
+                <span>маленький</span><br>
+                ритуал
+            </h1>
+
+            <p class="hero-description">
+                Отборные зёрна, внимание к деталям
+                и моменты, ради которых стоит замедлиться
+            </p>
+
+            <a href="{% url 'catalog' %}" class="hero-button">
+                ПОСМОТРЕТЬ МЕНЮ
+            </a>
+
+        </div>
+
+        <div class="hero-visual">
+
+            <div class="hero-photo">
+
+                <img
+                    src="{% static 'images/home-hero.jpg' %}"
+                    alt="Атмосфера кофейни MOKKA"
+                    class="hero-photo-image"
+                >
+
+                <div class="hero-photo">
+
+                    <img
+                        src="{% static 'css/js/images/home-hero.jpg' %}"
+                        alt="Атмосфера кофейни MOKKA"
+                        class="hero-photo-image"
+                    >
+
+                    <div class="hero-photo-overlay"></div>
+
+                    <p class="hero-photo-caption">
+                        НЕСПЕШНОЕ УТРО В MOKKA
+                    </p>
+
+                </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ЛЮБИМЫЕ ПОЗИЦИИ -->
+    <section class="favorites">
+
+        <div class="favorites-inner">
+
+            <div class="favorites-heading">
+                <p class="section-eyebrow">
+                    ВЫБРАНО С ЛЮБОВЬЮ
+                </p>
+
+                <h2>Любимые позиции</h2>
+            </div>
+
+            <div class="favorites-grid">
+
+                {% for product in products|slice:":3" %}
+
+                    <article class="favorite-card">
+
+                        <a href="{% url 'product_detail' product.id %}"
+                           class="favorite-image">
+
+                            {% if product.image_url %}
+                                <img
+                                    src="{{ product.image_url }}"
+                                    alt="{{ product.name }}"
+                                >
+                            {% else %}
+                                <div class="favorite-image-placeholder">
+                                    MOKKA
+                                </div>
+                            {% endif %}
+
+                        </a>
+
+                        <div class="favorite-info">
+
+                            <h3>
+                                <a href="{% url 'product_detail' product.id %}">
+                                    {{ product.name }}
+                                </a>
+                            </h3>
+
+                            <p>{{ product.description }}</p>
+
+                            <div class="favorite-bottom">
+
+                                <span class="favorite-price">
+                                    {{ product.price|floatformat:0 }} ₽
+                                </span>
+
+                                <a href="{% url 'product_detail' product.id %}"
+                                   class="favorite-link">
+                                    ПОДРОБНЕЕ
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                {% empty %}
+
+                    <p class="favorites-empty">
+                        Скоро здесь появятся наши любимые позиции
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+            <div class="favorites-more">
+                <a href="{% url 'catalog' %}">
+                    ВСЁ МЕНЮ →
+                </a>
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

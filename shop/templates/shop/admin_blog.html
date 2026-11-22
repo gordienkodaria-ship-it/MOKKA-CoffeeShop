@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Управление блогом — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <div class="admin-heading">
+        <div>
+            <p class="admin-eyebrow">MOKKA COFFEE / MANAGEMENT</p>
+            <h1>Блог</h1>
+            <p class="admin-subtitle">
+                Управление статьями и публикациями.
+            </p>
+        </div>
+
+        <a href="{% url 'admin_dashboard' %}" class="admin-back-link">
+            ← На главную панели
+        </a>
+    </div>
+
+    <div class="admin-add-product admin-blog-toolbar">
+        <span class="admin-orders-count">
+            Всего статей: {{ posts|length }}
+        </span>
+
+        <a href="{% url 'admin_blog_create' %}">
+            + ДОБАВИТЬ СТАТЬЮ
+        </a>
+    </div>
+
+    <div class="admin-section">
+
+        <div class="admin-section-heading">
+            <div>
+                <p class="admin-eyebrow">КОНТЕНТ</p>
+                <h2>Все статьи</h2>
+            </div>
+        </div>
+
+        <div class="admin-table-wrapper">
+            <table class="admin-table admin-blog-table">
+
+                <thead>
+                    <tr>
+                        <th>СТАТЬЯ</th>
+                        <th>ДАТА</th>
+                        <th>СТАТУС</th>
+                        <th>ДЕЙСТВИЯ</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for post in posts %}
+                    <tr>
+                        <td>{{ post.title }}</td>
+
+                        <td>{{ post.created_at|date:"d.m.Y" }}</td>
+
+                        <td>
+                            {% if post.is_published %}
+                                <span class="admin-order-status status-completed">
+                                    Опубликована
+                                </span>
+                            {% else %}
+                                <span class="admin-order-status status-cancelled">
+                                    Скрыта
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="admin-product-actions">
+                            <a href="{% url 'admin_blog_edit' post.id %}">
+                                Изменить
+                            </a>
+                            <a href="{% url 'admin_blog_delete' post.id %}">
+                                Удалить
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="admin-empty">
+                            Статей пока нет
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

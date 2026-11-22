@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Вход — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="auth-page">
+    <div class="auth-container">
+
+        <div class="auth-decoration">
+            <p class="auth-eyebrow">WELCOME TO MOKKA</p>
+            <h1>Рады видеть<br>вас снова.</h1>
+            <p>Ваше любимое место и любимый кофе уже ждут.</p>
+            <div class="auth-decoration-line"></div>
+            <span>MOKKA — COFFEE HOUSE</span>
+        </div>
+
+        <div class="auth-form-wrapper">
+            <p class="auth-form-eyebrow">ВАШ АККАУНТ</p>
+            <h2>Войти</h2>
+            <p class="auth-description">
+                Введите данные, чтобы продолжить.
+            </p>
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="auth-errors">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="auth-field">
+                    <label for="id_username">Логин</label>
+                    <input
+                        type="text"
+                        name="username"
+                        id="id_username"
+                        placeholder="Введите логин"
+                        autocomplete="username"
+                        required
+                    >
+                    {% for error in form.username.errors %}
+                        <small class="auth-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <div class="auth-field">
+                    <label for="id_password">Пароль</label>
+                    <input
+                        type="password"
+                        name="password"
+                        id="id_password"
+                        placeholder="Введите пароль"
+                        autocomplete="current-password"
+                        required
+                    >
+                    {% for error in form.password.errors %}
+                        <small class="auth-error">{{ error }}</small>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="auth-submit">
+                    ВОЙТИ В АККАУНТ
+                </button>
+            </form>
+
+            <div class="auth-switch">
+                <span>Ещё нет аккаунта?</span>
+                <a href="{% url 'register' %}">Зарегистрироваться</a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

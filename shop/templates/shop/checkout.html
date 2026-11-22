@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Оформление заказа — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="checkout-page">
+    <div class="checkout-container">
+
+        <a href="{% url 'cart' %}" class="checkout-back">
+            ← ВЕРНУТЬСЯ В КОРЗИНУ
+        </a>
+
+        <div class="checkout-heading">
+            <p class="checkout-eyebrow">MOKKA — ВАШ ВЫБОР</p>
+            <h1>Оформление заказа</h1>
+            <p>Остался всего один шаг до любимого кофе.</p>
+        </div>
+
+        <div class="checkout-layout">
+
+            <form method="post" class="checkout-form">
+                {% csrf_token %}
+
+                <div class="checkout-section">
+                    <p class="checkout-section-number">01 / ДАННЫЕ</p>
+                    <h2>Контактная информация</h2>
+
+                    
+                    <div class="checkout-field">
+                        <label for="customer_name">Ваше имя</label>
+                        <input
+                            type="text"
+                            id="customer_name"
+                            name="customer_name"
+                            value="{{ initial_name }}"
+                            placeholder="Как к вам обращаться?"
+                            required
+                        >
+                    </div>
+
+                    <div class="checkout-field">
+                        <label for="customer_phone">Номер телефона</label>
+                        <input
+                            type="tel"
+                            id="customer_phone"
+                            name="customer_phone"
+                            value="{{ initial_phone }}"
+                            placeholder="+7 (___) ___-__-__"
+                            maxlength="18"
+                            autocomplete="tel"
+                            required
+                        >
+                    </div>
+
+                    <div class="checkout-field">
+                        <label for="customer_email">Электронная почта</label>
+                        <input
+                            type="email"
+                            id="customer_email"
+                            name="customer_email"
+                            value="{{ initial_email }}"
+                            placeholder="example@mail.ru"
+                        >
+                    </div>
+
+                </div>
+
+                <div class="checkout-section">
+                    <p class="checkout-section-number">02 / ПОЖЕЛАНИЯ</p>
+                    <h2>Комментарий к заказу</h2>
+
+                    <div class="checkout-field">
+                        <label for="comment">Дополнительная информация</label>
+                        <textarea
+                            id="comment"
+                            name="comment"
+                            rows="4"
+                            placeholder="Ваши пожелания к заказу..."
+                        ></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="checkout-submit">
+                    ПОДТВЕРДИТЬ ЗАКАЗ
+                </button>
+            </form>
+
+            <aside class="checkout-summary">
+                <p class="checkout-section-number">ВАШ ЗАКАЗ</p>
+                <h2>Итого</h2>
+
+                <div class="checkout-summary-items">
+                    {% for item in items %}
+                    <div class="checkout-summary-item">
+                        <div>
+                            <span>{{ item.product.name }}</span>
+                            <small>{{ item.quantity }} шт.</small>
+                        </div>
+                        <strong>
+                            {% widthratio item.product.price 1 item.quantity %} ₽
+                        </strong>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="checkout-summary-total">
+                    <span>Общая сумма</span>
+                    <strong>{{ total|floatformat:0 }} ₽</strong>
+                </div>
+
+                <p class="checkout-summary-note">
+                    Спасибо, что выбираете MOKKA.
+                </p>
+            </aside>
+
+        </div>
+    </div>
+</section>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const phoneInput = document.getElementById('customer_phone');
+
+    if (!phoneInput) return;
+
+    function formatPhone(value) {
+        let digits = value.replace(/\D/g, '');
+
+        if (digits.startsWith('7') || digits.startsWith('8')) {
+            digits = digits.slice(1);
+        }
+
+        digits = digits.slice(0, 10);
+
+        let result = '+7 (';
+
+        if (digits.length > 0) result += digits.slice(0, 3);
+        if (digits.length >= 4) result += ') ' + digits.slice(3, 6);
+        if (digits.length >= 7) result += '-' + digits.slice(6, 8);
+        if (digits.length >= 9) result += '-' + digits.slice(8, 10);
+
+        return result;
+    }
+
+    phoneInput.addEventListener('input', function () {
+        this.value = formatPhone(this.value);
+    });
+
+    phoneInput.addEventListener('focus', function () {
+        if (!this.value) this.value = '+7 (';
+    });
+
+    phoneInput.addEventListener('blur', function () {
+        if (this.value === '+7 (') this.value = '';
+    });
+});
+</script>
+
+
+{% endblock %}

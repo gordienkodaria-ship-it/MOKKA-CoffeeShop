@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <div class="admin-heading">
+        <div>
+            <p class="admin-eyebrow">MOKKA COFFEE / MANAGEMENT</p>
+            <h1>{{ page_title }}</h1>
+            <p class="admin-subtitle">
+                Заполните информацию о товаре.
+            </p>
+        </div>
+
+        <a href="{% url 'admin_products' %}" class="admin-back-link">
+            ← К списку товаров
+        </a>
+    </div>
+
+    <div class="admin-section admin-form-section">
+
+        <form method="post" class="admin-edit-form">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="admin-form-field">
+
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small>{{ field.help_text }}</small>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <span class="admin-form-error">{{ error }}</span>
+                    {% endfor %}
+
+                </div>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+                <div class="admin-form-error">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="admin-form-actions">
+                <button type="submit" class="admin-submit-button">
+                    {% if product %}
+                        СОХРАНИТЬ ИЗМЕНЕНИЯ
+                    {% else %}
+                        ДОБАВИТЬ ТОВАР
+                    {% endif %}
+                </button>
+
+                <a href="{% url 'admin_products' %}" class="admin-cancel-link">
+                    Отмена
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

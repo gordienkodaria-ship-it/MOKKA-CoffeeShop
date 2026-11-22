@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Заказ №{{ order.id }} — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <div class="admin-heading">
+        <div>
+            <p class="admin-eyebrow">MOKKA COFFEE / MANAGEMENT</p>
+            <h1>Заказ №{{ order.id }}</h1>
+            <p class="admin-subtitle">
+                Создан {{ order.created_at|date:"d.m.Y в H:i" }}
+            </p>
+        </div>
+
+        <a href="{% url 'admin_orders' %}" class="admin-back-link">
+            ← К списку заказов
+        </a>
+    </div>
+
+    <div class="admin-order-detail-grid">
+
+        <div class="admin-section admin-order-info">
+
+            <p class="admin-eyebrow">ИНФОРМАЦИЯ О ПОКУПАТЕЛЕ</p>
+            <h2>Данные клиента</h2>
+
+            <div class="admin-detail-row">
+                <span>Имя</span>
+                <strong>{{ order.customer_name }}</strong>
+            </div>
+
+            <div class="admin-detail-row">
+                <span>Телефон</span>
+                <strong>{{ order.phone }}</strong>
+            </div>
+
+            <div class="admin-detail-row">
+                <span>Электронная почта</span>
+                <strong>{{ order.email|default:"Не указана" }}</strong>
+            </div>
+
+            <div class="admin-detail-row">
+                <span>Адрес</span>
+                <strong>{{ order.address|default:"Не указан" }}</strong>
+            </div>
+
+            <div class="admin-detail-row">
+                <span>Комментарий</span>
+                <strong>{{ order.comment|default:"Нет комментария" }}</strong>
+            </div>
+
+        </div>
+
+        <div class="admin-section admin-order-status-section">
+
+            <p class="admin-eyebrow">УПРАВЛЕНИЕ ЗАКАЗОМ</p>
+            <h2>Статус заказа</h2>
+
+            <form method="post" class="admin-status-form">
+                {% csrf_token %}
+
+                <label for="order-status">Текущий статус</label>
+
+                <select name="status" id="order-status">
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}"
+                            {% if order.status == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="admin-submit-button">
+                    СОХРАНИТЬ СТАТУС
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+
+    <div class="admin-section admin-order-items-section">
+
+        <div class="admin-section-heading">
+            <div>
+                <p class="admin-eyebrow">СОДЕРЖИМОЕ ЗАКАЗА</p>
+                <h2>Состав заказа</h2>
+            </div>
+
+            <span class="admin-orders-count">
+                {{ order.items.count }} поз.
+            </span>
+        </div>
+
+        <div class="admin-table-wrapper">
+
+            <table class="admin-table">
+
+                <thead>
+                    <tr>
+                        <th>ТОВАР</th>
+                        <th>ЦЕНА</th>
+                        <th>КОЛИЧЕСТВО</th>
+                        <th>СУММА</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.price|floatformat:2 }} ₽</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>
+                            {{ item.line_total|floatformat:2 }} ₽
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="admin-empty">
+                            В заказе нет товаров
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <div class="admin-order-total">
+            <span>ИТОГО К ОПЛАТЕ</span>
+            <strong>{{ order.total_price|floatformat:2 }} ₽</strong>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

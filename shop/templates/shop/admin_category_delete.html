@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Удаление категории — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <div class="admin-heading">
+        <div>
+            <p class="admin-eyebrow">MOKKA COFFEE / MANAGEMENT</p>
+            <h1>Удаление категории</h1>
+            <p class="admin-subtitle">
+                Подтвердите действие перед удалением.
+            </p>
+        </div>
+    </div>
+
+    <div class="admin-delete-card">
+
+        <p class="admin-eyebrow">ПОДТВЕРЖДЕНИЕ</p>
+
+        <h2>{{ category.name }}</h2>
+
+        {% if category.products.exists %}
+            <p class="admin-delete-description">
+                В этой категории ещё есть товары.
+                Сначала перенесите их в другую категорию или удалите.
+                Удаление сейчас невозможно.
+            </p>
+
+            <div class="admin-delete-actions">
+                <a href="{% url 'admin_categories' %}" class="admin-cancel-link">
+                    ← Вернуться к категориям
+                </a>
+            </div>
+
+        {% else %}
+            <p class="admin-delete-description">
+                Вы действительно хотите удалить эту категорию?
+                Это действие нельзя будет отменить.
+            </p>
+
+            <form method="post" class="admin-delete-actions">
+                {% csrf_token %}
+
+                <button type="submit" class="admin-delete-button">
+                    УДАЛИТЬ КАТЕГОРИЮ
+                </button>
+
+                <a href="{% url 'admin_categories' %}" class="admin-cancel-link">
+                    Отмена
+                </a>
+            </form>
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <div class="admin-heading">
+        <div>
+            <p class="admin-eyebrow">MOKKA COFFEE / MANAGEMENT</p>
+            <h1>{{ page_title }}</h1>
+            <p class="admin-subtitle">
+                Создание и редактирование материалов блога
+            </p>
+        </div>
+
+        <a href="{% url 'admin_blog' %}" class="admin-back-link">
+            ← К списку статей
+        </a>
+    </div>
+
+    <div class="admin-section admin-form-section admin-blog-edit-section">
+
+        <form method="post"
+              enctype="multipart/form-data"
+              class="admin-product-form admin-blog-edit-form">
+
+            {% csrf_token %}
+
+            {% for field in form %}
+
+                <div class="admin-form-group">
+
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small>{{ field.help_text }}</small>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <p class="admin-form-error">{{ error }}</p>
+                    {% endfor %}
+
+                </div>
+
+            {% endfor %}
+
+            {% if post and post.image %}
+                <div class="admin-current-image">
+                    <p>Текущее изображение:</p>
+
+                    <img src="{{ post.image.url }}"
+                         alt="{{ post.title }}">
+                </div>
+            {% endif %}
+
+            <div class="admin-form-actions">
+                <button type="submit" class="admin-submit-button">
+                    СОХРАНИТЬ СТАТЬЮ
+                </button>
+
+                <a href="{% url 'admin_blog' %}"
+                   class="admin-back-link">
+                    Отмена
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

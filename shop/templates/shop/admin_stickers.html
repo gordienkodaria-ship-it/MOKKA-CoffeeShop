@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}Доска заметок — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard stickers-dashboard">
+
+    <div class="admin-heading">
+        <div>
+            <p class="admin-eyebrow">MOKKA COFFEE / MANAGEMENT</p>
+            <h1>Доска заметок</h1>
+            <p class="stickers-subtitle">
+                Идеи, задачи и важные мысли команды MOKKA
+            </p>
+        </div>
+
+        <a href="{% url 'admin_dashboard' %}" class="admin-back-link">
+            ← Вернуться в панель
+        </a>
+    </div>
+
+    <section class="admin-section sticker-create-section">
+
+        <div class="sticker-form-heading">
+            <div>
+                <p class="admin-eyebrow">NEW NOTE</p>
+                <h2>Добавить заметку</h2>
+            </div>
+        </div>
+
+        <form method="POST" action="{% url 'admin_sticker_create' %}" class="sticker-create-form">
+            {% csrf_token %}
+
+            <input
+                type="text"
+                name="text"
+                maxlength="200"
+                placeholder="Напишите свою заметку..."
+                required
+            >
+
+            <div class="sticker-color-picker">
+                <span>Цвет:</span>
+
+                <label>
+                    <input type="radio" name="color" value="#F5CBA7" checked>
+                    <span style="background: #F5CBA7;"></span>
+                </label>
+
+                <label>
+                    <input type="radio" name="color" value="#F9E79F">
+                    <span style="background: #F9E79F;"></span>
+                </label>
+
+                <label>
+                    <input type="radio" name="color" value="#A9DFBF">
+                    <span style="background: #A9DFBF;"></span>
+                </label>
+
+                <label>
+                    <input type="radio" name="color" value="#AED6F1">
+                    <span style="background: #AED6F1;"></span>
+                </label>
+
+                <label>
+                    <input type="radio" name="color" value="#D7BDE2">
+                    <span style="background: #D7BDE2;"></span>
+                </label>
+
+                <label>
+                    <input type="radio" name="color" value="#F5B7B1">
+                    <span style="background: #F5B7B1;"></span>
+                </label>
+            </div>
+
+            <button type="submit" class="admin-action-button">
+                + Добавить стикер
+            </button>
+        </form>
+
+    </section>
+
+    <section class="sticker-board-section">
+
+        <div class="sticker-board-heading">
+            <div>
+                <p class="admin-eyebrow">YOUR IDEAS / YOUR SPACE</p>
+                <h2>Рабочая доска</h2>
+            </div>
+
+            <span>{{ stickers|length }} заметок</span>
+        </div>
+
+        <div class="sticker-board" id="stickerBoard">
+
+            {% for sticker in stickers %}
+
+                <div
+                    class="sticker-note"
+                    data-id="{{ sticker.id }}"
+                    data-move-url="{% url 'admin_sticker_move' sticker.id %}"
+                    style="
+                        background: {{ sticker.color }};
+                        left: {{ sticker.position_x }}px;
+                        top: {{ sticker.position_y }}px;
+                    "
+                >
+
+                    <div class="sticker-note-top">
+                        <span class="sticker-drag-handle">MOKKA NOTE</span>
+
+                        <form
+                            method="POST"
+                            action="{% url 'admin_sticker_delete' sticker.id %}"
+                            onsubmit="return confirm('Удалить эту заметку?');"
+                        >
+                            {% csrf_token %}
+                            <button type="submit" class="sticker-delete-button" title="Удалить">
+                                ×
+                            </button>
+                        </form>
+                    </div>
+
+                    <p>{{ sticker.text|linebreaksbr }}</p>
+
+                    <small>
+                        {{ sticker.created_at|date:"d.m.Y" }}
+                    </small>
+
+                </div>
+
+            {% empty %}
+
+                <div class="sticker-board-empty">
+                    <span>✦</span>
+                    <h3>Пока здесь чистый лист</h3>
+                    <p>Добавьте первую заметку, чтобы начать заполнять доску.</p>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</section>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const board = document.getElementById('stickerBoard');
+    const stickers = document.querySelectorAll('.sticker-note');
+
+    if (!board) return;
+
+    stickers.forEach(function (sticker) {
+        const handle = sticker.querySelector('.sticker-drag-handle');
+
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+        let initialLeft = 0;
+        let initialTop = 0;
+
+        handle.addEventListener('pointerdown', function (event) {
+            event.preventDefault();
+
+            isDragging = true;
+
+            const rect = sticker.getBoundingClientRect();
+
+            startX = event.clientX;
+            startY = event.clientY;
+
+            initialLeft = sticker.offsetLeft;
+            initialTop = sticker.offsetTop;
+
+            sticker.style.zIndex = 10;
+            handle.style.cursor = 'grabbing';
+
+            handle.setPointerCapture(event.pointerId);
+        });
+
+        handle.addEventListener('pointermove', function (event) {
+            if (!isDragging) return;
+
+            const dx = event.clientX - startX;
+            const dy = event.clientY - startY;
+
+            const maxX = board.clientWidth - sticker.offsetWidth;
+            const maxY = board.clientHeight - sticker.offsetHeight;
+
+            const newX = Math.max(
+                0,
+                Math.min(initialLeft + dx, maxX)
+            );
+
+            const newY = Math.max(
+                0,
+                Math.min(initialTop + dy, maxY)
+            );
+
+            sticker.style.left = newX + 'px';
+            sticker.style.top = newY + 'px';
+        });
+
+        handle.addEventListener('pointerup', savePosition);
+        handle.addEventListener('pointercancel', savePosition);
+
+        function savePosition() {
+            if (!isDragging) return;
+
+            isDragging = false;
+
+            handle.style.cursor = 'grab';
+            sticker.style.zIndex = 1;
+
+            const positionX = sticker.offsetLeft;
+            const positionY = sticker.offsetTop;
+
+            const csrfInput = sticker.querySelector(
+                'form input[name="csrfmiddlewaretoken"]'
+            );
+
+            const csrfToken = csrfInput.value;
+
+            const data = new URLSearchParams();
+            data.append('position_x', positionX);
+            data.append('position_y', positionY);
+            data.append('csrfmiddlewaretoken', csrfToken);
+
+            fetch(sticker.dataset.moveUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                },
+                body: data,
+                credentials: 'same-origin'
+            }).then(function (response) {
+                if (!response.ok) {
+                    throw new Error('Не удалось сохранить положение стикера');
+                }
+            }).catch(function (error) {
+                console.error(error);
+                alert('Не удалось сохранить положение стикера. Попробуйте ещё раз.');
+            });
+        }
+    });
+});
+</script>
+
+
+{% endblock %}

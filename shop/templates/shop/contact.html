@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Контакты — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="contact-page">
+
+    <!-- ПЕРВЫЙ ЭКРАН -->
+    <section class="contact-hero">
+        <div class="contact-hero-content">
+            <p class="contact-eyebrow">MOKKA COFFEE</p>
+
+            <h1>
+                Будем рады<br>
+                видеть вас
+            </h1>
+
+            <p>
+                Есть вопросы или предложения?
+                Мы всегда открыты к общению!
+            </p>
+        </div>
+    </section>
+
+    <!-- КОНТАКТНАЯ ИНФОРМАЦИЯ -->
+    <section class="contact-info">
+
+        <div class="contact-heading">
+            <p class="contact-eyebrow">СВЯЗАТЬСЯ С НАМИ</p>
+            <h2>Мы всегда на связи</h2>
+        </div>
+
+        <div class="contact-cards">
+
+            <div class="contact-card">
+                <span>НАШ АДРЕС</span>
+                <h3>Где нас найти</h3>
+                <p>ул. Ленина, 9, Новосибирск</p>
+            </div>
+
+            <div class="contact-card">
+                <span>ТЕЛЕФОН</span>
+                <h3>Позвоните нам</h3>
+                <p>+7 (383) 888-69-67</p>
+            </div>
+
+            <div class="contact-card">
+                <span>ЭЛЕКТРОННАЯ ПОЧТА</span>
+                <h3>Напишите нам</h3>
+                <p>mokka.coffee@gmail.com</p>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ВРЕМЯ РАБОТЫ -->
+    <section class="contact-hours">
+
+        <div class="contact-hours-content">
+            <p class="contact-eyebrow">МЫ ЖДЁМ ВАС</p>
+            <h2>Время для кофе</h2>
+            <p>
+                Заглядывайте к нам за любимым напитком,
+                приятной атмосферой и маленькой паузой
+                среди повседневных дел.
+            </p>
+        </div>
+
+        <div class="contact-hours-table">
+            <div>
+                <span>Понедельник — Воскресенье</span>
+                <strong>08:00 — 22:00</strong>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ЗАВЕРШЕНИЕ -->
+    <section class="contact-end">
+        <p class="contact-eyebrow">MOKKA COFFEE</p>
+        <h2>До встречи за чашкой кофе</h2>
+
+        <a href="{% url 'catalog' %}" class="contact-catalog-link">
+            ВЫБРАТЬ СВОЙ КОФЕ ↗
+        </a>
+    </section>
+
+</section>
+
+{% endblock %}

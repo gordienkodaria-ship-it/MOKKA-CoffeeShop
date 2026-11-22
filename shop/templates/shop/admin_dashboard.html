@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+{% block title %}Панель управления — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <!-- ШАПКА -->
+
+    <div class="admin-heading">
+        <div>
+            <p class="admin-eyebrow">MOKKA COFFEE / MANAGEMENT</p>
+            <h1>Панель управления</h1>
+            <p class="admin-subtitle">
+                Добро пожаловать в рабочее пространство MOKKA!
+            </p>
+        </div>
+
+        <div class="admin-heading-date">
+            <span>АДМИНИСТРАТИВНАЯ ПАНЕЛЬ</span>
+            <strong>OVERVIEW</strong>
+        </div>
+    </div>
+
+
+    <!-- ОСНОВНАЯ СТАТИСТИКА -->
+
+    <div class="admin-stats">
+
+        <div class="admin-stat-card">
+            <span>ВЫРУЧКА</span>
+            <strong>{{ total_sales|floatformat:0 }} ₽</strong>
+            <small>По выполненным заказам</small>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>ЗАКАЗЫ</span>
+            <strong>{{ orders_count }}</strong>
+            <small>За выбранный период</small>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>СРЕДНИЙ ЧЕК</span>
+            <strong>{{ average_check|floatformat:0 }} ₽</strong>
+            <small>По выполненным заказам</small>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>ПРОДАНО ТОВАРОВ</span>
+            <strong>{{ sold_items }}</strong>
+            <small>Единиц за период</small>
+        </div>
+
+    </div>
+
+
+    <!-- АНАЛИТИКА -->
+
+    <div class="admin-section analytics-section">
+
+        <div class="admin-section-heading">
+            <div>
+                <p class="admin-eyebrow">BUSINESS INTELLIGENCE</p>
+                <h2>Аналитика продаж</h2>
+            </div>
+
+            <div class="analytics-periods">
+                <a href="?period=7"
+                   class="analytics-period {% if selected_period == '7' %}active{% endif %}">
+                    7 дней
+                </a>
+
+                <a href="?period=30"
+                   class="analytics-period {% if selected_period == '30' %}active{% endif %}">
+                    30 дней
+                </a>
+
+                <a href="?period=all"
+                   class="analytics-period {% if selected_period == 'all' %}active{% endif %}">
+                    Всё время
+                </a>
+            </div>
+        </div>
+
+
+        <!-- ГРАФИК ВЫРУЧКИ -->
+
+        <div class="analytics-chart-card">
+
+            <div class="analytics-card-heading">
+                <div>
+                    <span>ДИНАМИКА</span>
+                    <h3>Выручка по дням</h3>
+                </div>
+
+                <span class="analytics-chart-unit">RUB / ₽</span>
+            </div>
+
+            <div class="analytics-chart-container">
+                <canvas id="revenueChart"></canvas>
+            </div>
+
+        </div>
+
+
+        <!-- ПОПУЛЯРНЫЕ ТОВАРЫ -->
+
+        <div class="analytics-products-card">
+
+            <div class="analytics-card-heading">
+                <div>
+                    <span>ТОВАРНЫЙ РЕЙТИНГ</span>
+                    <h3>Популярные товары</h3>
+                </div>
+            </div>
+
+            <div class="analytics-products-list">
+
+                {% for product in popular_products %}
+                <div class="analytics-product-row">
+
+                    <div class="analytics-product-info">
+                        <span class="analytics-product-rank">
+                            {{ forloop.counter|stringformat:"02d" }}
+                        </span>
+
+                        <div>
+                            <strong>{{ product.product_name }}</strong>
+                            <small>Продано единиц</small>
+                        </div>
+                    </div>
+
+                    <strong class="analytics-product-count">
+                        {{ product.total_quantity }}
+                    </strong>
+
+                </div>
+                {% empty %}
+                <div class="analytics-empty">
+                    За выбранный период продаж пока нет.
+                </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ПОСЛЕДНИЕ ЗАКАЗЫ -->
+
+    <div class="admin-section">
+
+        <div class="admin-section-heading">
+            <div>
+                <p class="admin-eyebrow">АКТИВНОСТЬ</p>
+                <h2>Последние заказы</h2>
+            </div>
+
+            <a href="{% url 'admin_orders' %}">
+                Все заказы ↗
+            </a>
+        </div>
+
+        <div class="admin-table-wrapper">
+            <table class="admin-table">
+
+                <thead>
+                    <tr>
+                        <th>НОМЕР</th>
+                        <th>КЛИЕНТ</th>
+                        <th>ДАТА</th>
+                        <th>СУММА</th>
+                        <th>СТАТУС</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.customer_name }}</td>
+                        <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>{{ order.total_price|floatformat:0 }} ₽</td>
+                        <td>
+                            <span class="admin-order-status status-{{ order.status }}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="admin-empty">
+                            Пока заказов нет
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+
+    <!-- БЫСТРЫЙ ДОСТУП -->
+
+    <div class="admin-section">
+
+        <div class="admin-section-heading">
+            <div>
+                <p class="admin-eyebrow">УПРАВЛЕНИЕ</p>
+                <h2>Быстрый доступ</h2>
+            </div>
+        </div>
+
+        <div class="admin-shortcuts">
+
+            <a href="{% url 'admin_products' %}" class="admin-shortcut">
+                <span>Товары</span>
+                <h3>Каталог и ассортимент</h3>
+                <b>↗</b>
+            </a>
+
+            <a href="{% url 'admin_orders' %}" class="admin-shortcut">
+                <span>Заказы</span>
+                <h3>Покупки и их статусы</h3>
+                <b>↗</b>
+            </a>
+
+            <a href="{% url 'admin_blog' %}" class="admin-shortcut">
+                <span>Блог</span>
+                <h3>Статьи и публикации</h3>
+                <b>↗</b>
+            </a>
+
+            <a href="{% url 'admin_stickers' %}" class="admin-shortcut">
+                <span>Доска заметок</span>
+                <h3>Идеи и задачи команды</h3>
+                <b>↗</b>
+            </a>
+
+            <a href="/admin/" class="admin-shortcut">
+                <span>Django Admin</span>
+                <h3>Полное управление данными</h3>
+                <b>↗</b>
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ДАННЫЕ ДЛЯ ГРАФИКА -->
+
+{{ revenue_by_day|json_script:"revenue-data" }}
+
+
+<!-- CHART.JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const dataElement = document.getElementById('revenue-data');
+    const canvas = document.getElementById('revenueChart');
+
+    if (!dataElement || !canvas || typeof Chart === 'undefined') {
+        return;
+    }
+
+    const revenueData = JSON.parse(dataElement.textContent);
+
+    const labels = revenueData.map(item => {
+        const date = new Date(item.day);
+        return date.toLocaleDateString('ru-RU', {
+            day: '2-digit',
+            month: 'short'
+        });
+    });
+
+    const values = revenueData.map(item => Number(item.revenue));
+
+    new Chart(canvas, {
+        type: 'line',
+
+        data: {
+            labels: labels,
+
+            datasets: [{
+                label: 'Выручка',
+                data: values,
+
+                borderColor: '#c9a96e',
+                backgroundColor: 'rgba(201, 169, 110, 0.12)',
+
+                borderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+
+                pointBackgroundColor: '#c9a96e',
+                pointBorderColor: '#17202d',
+
+                fill: true,
+                tension: 0.35
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+
+            plugins: {
+                legend: {
+                    display: false
+                },
+
+                tooltip: {
+                    backgroundColor: '#111923',
+                    titleColor: '#e9dfcc',
+                    bodyColor: '#ffffff',
+                    borderColor: '#c9a96e',
+                    borderWidth: 1,
+
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y.toLocaleString('ru-RU') + ' ₽';
+                        }
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+
+                    ticks: {
+                        color: '#a9a39a'
+                    }
+                },
+
+                y: {
+                    beginAtZero: true,
+
+                    grid: {
+                        color: 'rgba(201, 169, 110, 0.12)'
+                    },
+
+                    ticks: {
+                        color: '#a9a39a',
+
+                        callback: function(value) {
+                            return value.toLocaleString('ru-RU') + ' ₽';
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+});
+</script>
+
+{% endblock %}

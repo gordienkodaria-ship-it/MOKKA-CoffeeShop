@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Заказы — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <div class="admin-heading">
+        <div>
+            <p class="admin-eyebrow">MOKKA COFFEE / MANAGEMENT</p>
+            <h1>Заказы</h1>
+            <p class="admin-subtitle">
+                Все покупки и информация о клиентах.
+            </p>
+        </div>
+
+        <a href="{% url 'admin_dashboard' %}" class="admin-back-link">
+            ← На главную панели
+        </a>
+    </div>
+
+    <div class="admin-section">
+
+        <div class="admin-section-heading">
+            <div>
+                <p class="admin-eyebrow">ИСТОРИЯ ПОКУПОК</p>
+                <h2>Все заказы</h2>
+            </div>
+
+            <span class="admin-orders-count">
+                Всего: {{ orders|length }}
+            </span>
+        </div>
+
+        <div class="admin-table-wrapper">
+            <table class="admin-table admin-orders-table">
+
+                <thead>
+                    <tr>
+                        <th>НОМЕР</th>
+                        <th>КЛИЕНТ</th>
+                        <th>ТЕЛЕФОН</th>
+                        <th>ДАТА</th>
+                        <th>СУММА</th>
+                        <th>СТАТУС</th>
+                        <th>ДЕЙСТВИЯ</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+
+                        <td>{{ order.customer_name }}</td>
+
+                        <td>{{ order.phone }}</td>
+
+                        <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+
+                        <td>{{ order.total_price|floatformat:0 }} ₽</td>
+
+                        <td>
+                            <span class="admin-order-status status-{{ order.status }}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </td>
+
+                        <td class="admin-product-actions">
+                            <a href="{% url 'admin_order_detail' order.id %}">
+                                Подробнее →
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="admin-empty">
+                            Заказов пока нет
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

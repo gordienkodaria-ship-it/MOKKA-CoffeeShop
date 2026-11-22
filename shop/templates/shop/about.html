@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}О нас — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="about-page">
+
+    <!-- ПЕРВЫЙ ЭКРАН -->
+    <section class="about-hero">
+        <div class="about-hero-content">
+            <p class="about-eyebrow">ИСТОРИЯ MOKKA</p>
+
+            <h1>
+                Больше,<br>
+                чем просто кофе
+            </h1>
+
+            <p class="about-hero-description">
+                Пространство, где вкус встречается с атмосферой,
+                а обычные моменты становятся особенными.
+            </p>
+        </div>
+    </section>
+
+    <!-- НАША ИСТОРИЯ -->
+    <section class="about-story">
+
+        <div class="about-story-image">
+            <img
+                src="{% static 'images/about-coffee.png' %}"
+                alt="Кофе MOKKA"
+            >
+        </div>
+
+        <div class="about-story-content">
+            <p class="about-eyebrow">НАША ИСТОРИЯ</p>
+
+            <h2>Место, где хочется остаться</h2>
+
+            <p>
+                MOKKA — это больше, чем чашка любимого напитка.
+                Это настроение, атмосфера и возможность
+                ненадолго остановиться в ритме большого дня.
+            </p>
+
+            <p>
+                Мы создали пространство, в котором каждая
+                деталь имеет значение: от аромата свежего кофе
+                до момента, когда вы делаете первый глоток.
+            </p>
+        </div>
+
+    </section>
+
+    <!-- НАША ФИЛОСОФИЯ -->
+    <section class="about-philosophy">
+
+        <p class="about-eyebrow">ВО ЧТО МЫ ВЕРИМ</p>
+
+        <h2>Красота — в простых вещах</h2>
+
+        <p>
+            В неспешном утре, тёплом разговоре, любимом вкусе
+            и маленьких моментах, которые делают день лучше.
+            Именно такую философию мы вкладываем в MOKKA.
+        </p>
+
+    </section>
+
+    <!-- НАШ ПОДХОД -->
+    <section class="about-values">
+
+        <div class="about-value">
+            <span>Вкус</span>
+            <h3>Внимание к каждому напитку и деталям его приготовления</h3>
+        </div>
+
+        <div class="about-value">
+            <span>Атмосфера</span>
+            <h3>Пространство, в котором комфортно быть собой</h3>
+        </div>
+
+        <div class="about-value">
+            <span>Моменты</span>
+            <h3>Вдохновение находить особенное в повседневном</h3>
+        </div>
+
+    </section>
+
+    <!-- ЗАВЕРШЕНИЕ -->
+    <section class="about-end">
+        <p class="about-eyebrow">MOKKA COFFEE</p>
+
+        <h2>Ваш момент начинается здесь</h2>
+
+        <a href="{% url 'catalog' %}" class="about-catalog-link">
+            ВЫБРАТЬ СВОЙ КОФЕ ↗
+        </a>
+    </section>
+
+</section>
+
+{% endblock %}

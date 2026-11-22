@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Личный кабинет — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="profile-page">
+
+    <div class="profile-heading">
+        <p class="profile-eyebrow">ВАШ ПРОФИЛЬ</p>
+        <h1>Добрый день, {{ user_profile.full_name|default:user.username }}!</h1>
+    </div>
+
+    <div class="profile-layout">
+
+        <!-- БОКОВАЯ ПАНЕЛЬ -->
+        <aside class="profile-sidebar">
+
+            <p class="profile-sidebar-title">АККАУНТ</p>
+
+            <a href="#personal-data" class="profile-nav-link">
+                Личные данные
+            </a>
+
+            <a href="#orders" class="profile-nav-link">
+                История заказов
+            </a>
+
+            <div class="profile-sidebar-divider"></div>
+
+            {% if user.is_staff %}
+                <a href="{% url 'admin_dashboard' %}" class="profile-admin-link">
+                    <span>✦</span>
+                    Панель управления
+                    <span class="profile-admin-arrow">↗</span>
+                </a>
+
+                <div class="profile-sidebar-divider"></div>
+            {% endif %}
+
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="profile-logout">
+                    Выйти из аккаунта
+                </button>
+            </form>
+
+        </aside>
+
+        <!-- ОСНОВНОЙ БЛОК -->
+        <div class="profile-content">
+
+            <!-- ЛИЧНЫЕ ДАННЫЕ -->
+            <div class="profile-personal" id="personal-data">
+
+                <p class="profile-section-title">ЛИЧНЫЕ ДАННЫЕ</p>
+
+                <div class="profile-info-row">
+                    <span>Логин</span>
+                    <strong>{{ user.username }}</strong>
+                </div>
+
+                <!-- ЭЛЕКТРОННАЯ ПОЧТА -->
+                <form method="post" class="profile-email-form">
+                    {% csrf_token %}
+
+                    <label for="{{ email_form.email.id_for_label }}">
+                        Электронная почта
+                    </label>
+
+                    <div class="profile-email-controls">
+                        {{ email_form.email }}
+
+                        <button type="submit" name="save_email">
+                            СОХРАНИТЬ
+                        </button>
+                    </div>
+
+                    {% for error in email_form.email.errors %}
+                        <small class="auth-error">{{ error }}</small>
+                    {% endfor %}
+                </form>
+
+                <!-- ИМЯ И ТЕЛЕФОН -->
+                <form method="post" class="profile-contacts-form">
+                    {% csrf_token %}
+
+                    <div class="profile-contact-field">
+                        <label for="profile-full-name">Имя</label>
+
+                        <input
+                            type="text"
+                            id="profile-full-name"
+                            name="full_name"
+                            value="{{ user_profile.full_name }}"
+                            placeholder="Введите ваше имя"
+                        >
+                    </div>
+
+                    <div class="profile-contact-field">
+                        <label for="profile-phone">Номер телефона</label>
+
+                        <input
+                            type="tel"
+                            id="profile-phone"
+                            name="phone"
+                            value="{{ user_profile.phone }}"
+                            placeholder="+7 (___) ___-__-__"
+                        >
+                    </div>
+
+                    <button type="submit" name="save_contacts">
+                        СОХРАНИТЬ ДАННЫЕ
+                    </button>
+                </form>
+
+            </div>
+
+            <!-- ИСТОРИЯ ЗАКАЗОВ -->
+            <div class="profile-orders" id="orders">
+
+                <p class="profile-section-title">ИСТОРИЯ ЗАКАЗОВ</p>
+
+                {% if orders %}
+
+                    {% for order in orders %}
+                    <article class="profile-order">
+
+                        <div class="profile-order-heading">
+                            <h3>Заказ №{{ order.id }}</h3>
+                            <span>{{ order.created_at|date:"d.m.Y" }}</span>
+                        </div>
+
+                        <p class="profile-order-status">
+                            {{ order.get_status_display|default:order.status }}
+                        </p>
+
+                        <div class="profile-order-products">
+                            {% for item in order.items.all %}
+                                <span>
+                                    {{ item.product_name }} × {{ item.quantity }}
+                                </span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="profile-order-footer">
+                            <strong>
+                                {{ order.total_price|floatformat:0 }} ₽
+                            </strong>
+
+                            <a href="{% url 'receipt' order.id %}">
+                                ПОСМОТРЕТЬ ЧЕК →
+                            </a>
+                        </div>
+
+                    </article>
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="profile-empty">
+                        <h3>Здесь пока тихо</h3>
+                        <p>У вас ещё нет заказов. Самое время выбрать любимый кофе!</p>
+
+                        <a href="{% url 'catalog' %}">
+                            ПЕРЕЙТИ В МЕНЮ →
+                        </a>
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const phoneInput = document.getElementById('profile-phone');
+    if (!phoneInput) return;
+
+    function formatPhone(value) {
+        let digits = value.replace(/\D/g, '');
+
+        if (digits.startsWith('7') || digits.startsWith('8')) {
+            digits = digits.slice(1);
+        }
+
+        digits = digits.slice(0, 10);
+
+        let result = '+7 (';
+
+        if (digits.length > 0) result += digits.slice(0, 3);
+        if (digits.length >= 4) result += ') ' + digits.slice(3, 6);
+        if (digits.length >= 7) result += '-' + digits.slice(6, 8);
+        if (digits.length >= 9) result += '-' + digits.slice(8, 10);
+
+        return result;
+    }
+
+    phoneInput.addEventListener('input', function () {
+        this.value = formatPhone(this.value);
+    });
+
+    phoneInput.addEventListener('focus', function () {
+        if (!this.value) this.value = '+7 (';
+    });
+
+    phoneInput.addEventListener('blur', function () {
+        if (this.value === '+7 (') this.value = '';
+    });
+});
+</script>
+
+
+{% endblock %}

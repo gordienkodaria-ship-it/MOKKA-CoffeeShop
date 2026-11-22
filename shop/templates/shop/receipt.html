@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Чек №{{ order.id }} — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="receipt-page">
+    <div class="receipt-container">
+
+        <div class="receipt-header">
+            <p class="receipt-eyebrow">MOKKA COFFEE HOUSE</p>
+            <h1>Ваш чек</h1>
+            <p>Спасибо, что выбираете MOKKA.</p>
+        </div>
+
+        <div class="receipt-paper">
+
+            <div class="receipt-brand">
+                <span>MOKKA</span>
+                <small>COFFEE HOUSE</small>
+            </div>
+
+            <div class="receipt-divider"></div>
+
+            <div class="receipt-info">
+                <div>
+                    <span>Номер заказа</span>
+                    <strong>№{{ order.id }}</strong>
+                </div>
+                <div>
+                    <span>Дата оформления</span>
+                    <strong>{{ order.created_at|date:"d.m.Y H:i" }}</strong>
+                </div>
+                <div>
+                    <span>Покупатель</span>
+                    <strong>{{ order.customer_name }}</strong>
+                </div>
+                <div>
+                    <span>Телефон</span>
+                    <strong>{{ order.phone }}</strong>
+                </div>
+                {% if order.email %}
+                <div>
+                    <span>Электронная почта</span>
+                    <strong>{{ order.email }}</strong>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="receipt-divider"></div>
+
+            <p class="receipt-items-title">СОСТАВ ЗАКАЗА</p>
+
+            <div class="receipt-items">
+                {% for item in order.items.all %}
+                <div class="receipt-item">
+                    <div class="receipt-item-info">
+                        <strong>{{ item.product_name }}</strong>
+                        <span>{{ item.quantity }} × {{ item.price|floatformat:0 }} ₽</span>
+                    </div>
+                    <strong>
+                        {% widthratio item.price 1 item.quantity %} ₽
+                    </strong>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="receipt-divider"></div>
+
+            <div class="receipt-total">
+                <span>ИТОГО</span>
+                <strong>{{ order.total_price|floatformat:0 }} ₽</strong>
+            </div>
+
+            {% if order.comment %}
+            <div class="receipt-comment">
+                <span>Комментарий к заказу</span>
+                <p>{{ order.comment }}</p>
+            </div>
+            {% endif %}
+
+            <div class="receipt-divider"></div>
+
+            <p class="receipt-thanks">
+                Спасибо за ваш заказ!<br>
+                Будем рады видеть вас снова.
+            </p>
+
+            <p class="receipt-footer">MOKKA — МЕСТО, ГДЕ МОЖНО ОСТАНОВИТЬСЯ</p>
+
+        </div>
+
+        <div class="receipt-actions">
+            <button onclick="window.print()" class="receipt-print">
+                РАСПЕЧАТАТЬ ЧЕК
+            </button>
+
+            <a href="{% url 'catalog' %}" class="receipt-home">
+                ВЕРНУТЬСЯ В КАТАЛОГ
+            </a>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

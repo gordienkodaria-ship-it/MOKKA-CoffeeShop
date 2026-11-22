@@ -1,0 +1,46 @@
+
+{% extends "base.html" %}
+
+{% block title %}Удаление товара — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <div class="admin-heading">
+        <div>
+            <p class="admin-eyebrow">MOKKA COFFEE / MANAGEMENT</p>
+            <h1>Удаление товара</h1>
+            <p class="admin-subtitle">
+                Подтвердите действие перед удалением.
+            </p>
+        </div>
+    </div>
+
+    <div class="admin-delete-card">
+        <p class="admin-eyebrow">ПОДТВЕРЖДЕНИЕ</p>
+
+        <h2>{{ product.name }}</h2>
+
+        <p class="admin-delete-description">
+            Вы действительно хотите удалить этот товар?
+            Это действие нельзя будет отменить.
+        </p>
+
+        <form method="post" class="admin-delete-actions">
+            {% csrf_token %}
+
+            <button type="submit" class="admin-delete-button">
+                УДАЛИТЬ ТОВАР
+            </button>
+
+            <a href="{% url 'admin_products' %}" class="admin-cancel-link">
+                Отмена
+            </a>
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

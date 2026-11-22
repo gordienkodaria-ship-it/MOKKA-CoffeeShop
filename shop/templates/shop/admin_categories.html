@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Категории — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <div class="admin-heading">
+        <div>
+            <p class="admin-eyebrow">MOKKA COFFEE / MANAGEMENT</p>
+            <h1>Категории</h1>
+            <p class="admin-subtitle">
+                Управление категориями ассортимента.
+            </p>
+        </div>
+
+        <a href="{% url 'admin_dashboard' %}" class="admin-back-link">
+            ← На главную панели
+        </a>
+    </div>
+
+    <div class="admin-add-product">
+        <a href="{% url 'admin_category_create' %}">
+            + ДОБАВИТЬ КАТЕГОРИЮ
+        </a>
+    </div>
+
+    <div class="admin-section">
+
+        <div class="admin-section-heading">
+            <div>
+                <p class="admin-eyebrow">СТРУКТУРА АССОРТИМЕНТА</p>
+                <h2>Все категории</h2>
+            </div>
+
+            <span class="admin-orders-count">
+                Всего: {{ categories|length }}
+            </span>
+        </div>
+
+        <div class="admin-table-wrapper">
+            <table class="admin-table">
+
+                <thead>
+                    <tr>
+                        <th>НАЗВАНИЕ</th>
+                        <th>ОПИСАНИЕ</th>
+                        <th>КОЛИЧЕСТВО ТОВАРОВ</th>
+                        <th>ДЕЙСТВИЯ</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td>{{ category.name }}</td>
+
+                        <td>
+                            {% if category.description %}
+                                {{ category.description|truncatechars:60 }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>{{ category.products_count }}</td>
+
+                        <td class="admin-product-actions">
+                            <a href="{% url 'admin_category_edit' category.id %}">
+                                Редактировать
+                            </a>
+
+                            <a href="{% url 'admin_category_delete' category.id %}"
+                               class="delete-link">
+                                Удалить
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="admin-empty">
+                            Категорий пока нет
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

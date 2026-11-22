@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }} — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="blog-article-page">
+
+    <div class="blog-article-container">
+
+        <!-- ВОЗВРАТ К ЖУРНАЛУ -->
+        <a href="{% url 'blog' %}" class="article-back">
+            ← ВЕРНУТЬСЯ В ЖУРНАЛ
+        </a>
+
+        <!-- ГЛАВНОЕ ИЗОБРАЖЕНИЕ -->
+        <div class="article-hero">
+
+            {% if post.image %}
+                <img src="{{ post.image.url }}" alt="{{ post.title }}">
+            {% else %}
+                <div class="article-image-placeholder">
+                    MOKKA
+                </div>
+            {% endif %}
+
+            <span class="article-image-caption">
+                ЖУРНАЛ MOKKA
+            </span>
+
+        </div>
+
+        <!-- СОДЕРЖАНИЕ СТАТЬИ -->
+        <article class="article-content">
+
+            <p class="article-eyebrow">
+                ЖУРНАЛ · КУЛЬТУРА
+                <span>·</span>
+                {{ post.created_at|date:"d.m.Y" }}
+            </p>
+
+            <h1>{{ post.title }}</h1>
+
+            <p class="article-excerpt">
+                {{ post.excerpt }}
+            </p>
+
+            <div class="article-divider"></div>
+
+            <div class="article-text">
+                {{ post.content|linebreaks }}
+            </div>
+
+            <a href="{% url 'blog' %}" class="article-back-bottom">
+                ← ВСЕ СТАТЬИ ЖУРНАЛА
+            </a>
+
+        </article>
+
+    </div>
+
+</section>
+
+{% endblock %}

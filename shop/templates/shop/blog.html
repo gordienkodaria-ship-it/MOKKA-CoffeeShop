@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Журнал — MOKKA{% endblock %}
+
+{% block content %}
+
+<section class="blog-page">
+
+    <div class="blog-container">
+
+        <!-- ЗАГОЛОВОК -->
+        <section class="blog-intro">
+            <p class="blog-eyebrow">ЗАМЕТКИ ИЗ НАШЕГО МИРА</p>
+
+            <h1>Журнал MOKKA</h1>
+
+            <p class="blog-description">
+                Истории, ритуалы и немного больше об искусстве кофе
+            </p>
+        </section>
+
+        <!-- КАРТОЧКИ СТАТЕЙ -->
+        <section class="blog-grid">
+
+            {% for post in posts %}
+
+                <article class="blog-card">
+
+                    <a href="{% url 'blog_detail' post.slug %}"
+                       class="blog-card-image">
+
+                        {% if post.image %}
+                            <img src="{{ post.image.url }}" alt="{{ post.title }}">
+                        {% else %}
+                            <div class="blog-image-placeholder">
+                                MOKKA
+                            </div>
+                        {% endif %}
+
+                        <span class="blog-image-label">
+                            ЖУРНАЛ · {{ forloop.counter|stringformat:"02d" }}
+                        </span>
+
+                    </a>
+
+                    <div class="blog-card-info">
+
+                        <p class="blog-card-eyebrow">
+                            ИЗБРАННАЯ ИСТОРИЯ ·
+                            {{ forloop.counter|stringformat:"02d" }}
+                        </p>
+
+                        <h2>
+                            <a href="{% url 'blog_detail' post.slug %}">
+                                {{ post.title }}
+                            </a>
+                        </h2>
+
+                        <p class="blog-card-description">
+                            {{ post.excerpt }}
+                        </p>
+
+                        <a href="{% url 'blog_detail' post.slug %}"
+                           class="blog-read-link">
+                            ЧИТАТЬ ↗
+                        </a>
+
+                    </div>
+
+                </article>
+
+            {% empty %}
+
+                <p class="blog-empty">
+                    Скоро здесь появятся наши первые истории
+                </p>
+
+            {% endfor %}
+
+        </section>
+
+    </div>
+
+</section>
+
+{% endblock %}

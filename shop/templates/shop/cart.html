@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Корзина — MOKKA{% endblock %}
+
+{% block content %}
+<div class="mokka-cart">
+    <div class="cart-container">
+
+        <section class="cart-intro">
+            <p class="cart-eyebrow">ВАШ ВЫБОР</p>
+            <h1>Корзина</h1>
+            <p>Всё самое любимое — в одном месте</p>
+        </section>
+
+        {% if items %}
+            <div class="cart-layout">
+                <div class="cart-items">
+                    {% for item in items %}
+                        
+                    <article class="cart-item" data-cart-item data-price="{{ item.product.price }}">
+                        <div class="cart-item-image">
+                            {% if item.product.image_url %}
+                                <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
+                            {% else %}
+                                <span>MOKKA</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="cart-item-info">
+                            <h2>{{ item.product.name }}</h2>
+                            <p>{{ item.product.description }}</p>
+
+                            <span class="cart-item-price">
+                                <span data-item-total>{{ item.product.price|floatformat:0 }}</span> ₽
+                            </span>
+                        </div>
+
+                        <div class="cart-item-actions">
+                            <form class="cart-quantity-form"
+                                method="post"
+                                action="{% url 'update_cart' item.product.id %}">
+                                {% csrf_token %}
+
+                                    <button type="button" class="quantity-btn" data-quantity-minus aria-label="Уменьшить количество">−</button>
+
+                                    <input
+                                        type="number"
+                                        name="quantity"
+                                        value="{{ item.quantity }}"
+                                        min="1"
+                                        max="99"
+                                        data-quantity-input
+                                    >
+
+                                    <button type="button" class="quantity-btn" data-quantity-plus aria-label="Увеличить количество">+</button>
+                            </form>
+
+                            <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="cart-remove">УДАЛИТЬ</button>
+                            </form>
+                        </div>
+                    </article>
+
+                    {% endfor %}
+                </div>
+
+                <aside class="cart-summary">
+                    <h2>Ваш заказ</h2>
+                    <div class="cart-summary-line">
+                        <span>Итого</span>
+                        <strong data-cart-total>{{ total|floatformat:0 }} ₽</strong>
+                    </div>
+                    <a href="{% url 'checkout' %}" class="cart-checkout">
+                        ОФОРМИТЬ ЗАКАЗ
+                    </a>
+                    <a href="{% url 'catalog' %}" class="cart-continue">
+                        ПРОДОЛЖИТЬ ПОКУПКИ
+                    </a>
+                </aside>
+            </div>
+
+        {% else %}
+            <div class="cart-empty">
+                <h2>Ваша корзина пока пуста.</h2>
+                <p>Самое время выбрать что-нибудь вкусное.</p>
+                <a href="{% url 'catalog' %}" class="cart-checkout">
+                    ПЕРЕЙТИ В МЕНЮ
+                </a>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const cartItems = document.querySelectorAll('[data-cart-item]');
+    const cartTotal = document.querySelector('[data-cart-total]');
+
+    // Форматирование цены
+    function formatPrice(value) {
+        return new Intl.NumberFormat('ru-RU', {
+            maximumFractionDigits: 0
+        }).format(value) + ' ₽';
+    }
+
+    // Безопасное преобразование цены в число
+    function getPrice(item) {
+        const rawPrice = item.dataset.price || '0';
+        return parseFloat(rawPrice.replace(',', '.')) || 0;
+    }
+
+    // Пересчёт общей суммы
+    function recalculateCart() {
+        let total = 0;
+
+        cartItems.forEach(function (item) {
+            const price = getPrice(item);
+            const quantityInput = item.querySelector('input[name="quantity"]');
+            const quantity = Math.max(1, parseInt(quantityInput.value, 10) || 1);
+
+            const itemTotal = price * quantity;
+            total += itemTotal;
+
+            const itemTotalElement = item.querySelector('[data-item-total]');
+
+            if (itemTotalElement) {
+                itemTotalElement.textContent = formatPrice(itemTotal);
+            }
+        });
+
+        if (cartTotal) {
+            cartTotal.textContent = formatPrice(total);
+        }
+    }
+
+    // Сохранение количества на сервере
+    async function saveQuantity(form) {
+        const buttons = form.querySelectorAll('button');
+
+        buttons.forEach(function (button) {
+            button.disabled = true;
+        });
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                credentials: 'same-origin'
+            });
+
+            if (!response.ok) {
+                throw new Error('Не удалось сохранить количество');
+            }
+        } catch (error) {
+            console.error(error);
+            window.location.reload();
+        } finally {
+            buttons.forEach(function (button) {
+                button.disabled = false;
+            });
+        }
+    }
+
+    // Обработка каждого товара
+    cartItems.forEach(function (item) {
+        const form = item.querySelector('.cart-quantity-form');
+
+        if (!form) return;
+
+        const input = form.querySelector('input[name="quantity"]');
+        const minusButton = form.querySelector('[data-quantity-minus]');
+        const plusButton = form.querySelector('[data-quantity-plus]');
+
+        // Уменьшение количества
+        minusButton.addEventListener('click', function () {
+            const currentValue = parseInt(input.value, 10) || 1;
+
+            if (currentValue > 1) {
+                input.value = currentValue - 1;
+                recalculateCart();
+                saveQuantity(form);
+            }
+        });
+
+        // Увеличение количества
+        plusButton.addEventListener('click', function () {
+            const currentValue = parseInt(input.value, 10) || 1;
+
+            if (currentValue < 99) {
+                input.value = currentValue + 1;
+                recalculateCart();
+                saveQuantity(form);
+            }
+        });
+
+        // Ручное изменение количества
+        input.addEventListener('change', function () {
+            let quantity = parseInt(input.value, 10) || 1;
+
+            quantity = Math.max(1, Math.min(99, quantity));
+            input.value = quantity;
+
+            recalculateCart();
+            saveQuantity(form);
+        });
+
+        // Запрещаем стандартную отправку формы
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+        });
+    });
+
+    // Первоначальный расчёт
+    recalculateCart();
+});
+</script>
+
+{% endblock %}
